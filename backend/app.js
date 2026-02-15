@@ -13,20 +13,71 @@ app.use(cors());
 app.use(express.json());
 
 //routes
-app.get("/library", (req, res) => {
-  res.status(200).json({
-    success: true,
-    message: "working",
-  });
-});
-//create
-app.post("/library", async (req, res) => {
+app.get("/library", async (req, res) => {
   try {
-    
-    console.log(req.body);
-  } catch (err) {}
+    const books = await Book.find();
+    res.status(200).json(books);
+  } catch (err) {
+    res.status(500).json({
+      message: "error fetching books",
+    });
+  }
 });
 
-app.listen(3300, () => {
+//create route
+app.post("/library", async (req, res) => {
+  try {
+    let { title, Author, Price } = req.body;
+
+    let newBook = new Book({
+      title,
+      Author,
+      Price,
+    });
+
+    await newBook.save();
+
+    res.status(201).json({
+      success: true,
+      message: "Book created successfully",
+      data: newBook,
+    });
+    console.log("saved :", newBook);
+  } catch (err) {
+    console.log("create : ", err);
+
+    (res.status(500),
+      json({
+        success: false,
+        message: "inventory Server Error",
+      }));
+  }
+});
+
+//delete route
+app.delete("/library/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const deleteBook = await Book.findByIdAndDelete(id);
+    if (!deleteBook) {
+      return res.status(404).json({
+        success: false,
+        message: "book not found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "book removed successfully",
+    });
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: "Server Error",
+    });
+  }
+});
+
+app.listen(3000, () => {
   console.log("runnning on port");
 });

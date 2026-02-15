@@ -1,47 +1,43 @@
 import React, { useEffect } from "react";
-import { useState} from "react";
+import { useState } from "react";
 import instance from "../services/api";
 
 export default function Library() {
+  const [books, setBooks] = useState([]);
+
   const [formData, setFormData] = useState({
     title: "",
-    author: "",
-    price: "",
+    Author: "",
+    Price: "",
   });
-  const handleSubmit = async(e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    try{
-      
-
- let result = await instance.post("/library" , formData);
- 
-if(result.success){
-    
-}
-
-
-
-
-    }catch(err){
-        console.log("librabry err" , err);
-
+    try {
+      let result = await instance.post("/library", formData);
+      const fetchBooks = async () => {
+        const res = await instance.get("/library");
+        setBooks(res.data);
+        console.log(res.data);
+      };
+      await fetchBooks();
+    } catch (err) {
+      console.log("librabry err", err);
     }
-
-
 
     console.log(formData);
   };
-
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev =>({
-        ...prev ,
-         [name] : value
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
     }));
   };
+
   return (
     <>
+
       <div className="library">
         <form onSubmit={handleSubmit}>
           <label>Title</label>
@@ -57,8 +53,8 @@ if(result.success){
           <label>Author</label>
           <input
             type="text"
-            name="author"
-            value={formData.author}
+            name="Author"
+            value={formData.Author}
             onChange={handleChange}
             placeholder="Author Name"
             required
@@ -67,14 +63,25 @@ if(result.success){
           <label>Price</label>
           <input
             type="text"
-            name="price"
-            value={formData.price}
+            name="Price"
+            value={formData.Price}
             onChange={handleChange}
             placeholder="Price"
             required
           />
           <button type="submit">Submit</button>
         </form>
+        <h2>Books list</h2>
+        {books.map((book) => (
+          <div key={book._id}>
+            <h3>Title :{book.title}</h3>
+            <h3>Author : {book.Author}</h3>
+            <h3>Price : {book.Price}</h3>
+            <button>update</button>  &nbsp;
+            <button>delete</button>
+            <hr />
+          </div>
+        ))}
       </div>
     </>
   );
