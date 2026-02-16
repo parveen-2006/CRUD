@@ -28,6 +28,14 @@ app.get("/library", async (req, res) => {
 app.post("/library", async (req, res) => {
   try {
     let { title, Author, Price } = req.body;
+    console.log(req.body);
+    if (!title || !Author || !Price) {
+      console.log("fill your data");
+      res.status(404).json({
+        success: false,
+        message: "fill your data",
+      });
+    }
 
     let newBook = new Book({
       title,
@@ -46,11 +54,10 @@ app.post("/library", async (req, res) => {
   } catch (err) {
     console.log("create : ", err);
 
-    (res.status(500),
-      json({
-        success: false,
-        message: "inventory Server Error",
-      }));
+    res.status(500).json({
+      success: false,
+      message: "inventory Server Error",
+    });
   }
 });
 
@@ -69,6 +76,37 @@ app.delete("/library/:id", async (req, res) => {
     res.status(200).json({
       success: true,
       message: "book removed successfully",
+    });
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: "Server Error",
+    });
+  }
+});
+
+//UPDATE route
+app.put("/library/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { title, Author, Price } = req.body;
+
+    const updateBook = await Book.findByIdAndUpdate(
+      id,
+      { title, Author, Price },
+      { new: true },
+    );
+
+    if (!updateBook) {
+      return res.status(404).json({
+        success: false,
+        message: "Book not found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "book updated successfully",
     });
   } catch (err) {
     res.status(500).json({

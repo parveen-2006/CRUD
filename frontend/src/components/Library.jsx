@@ -4,29 +4,49 @@ import instance from "../services/api";
 
 export default function Library() {
   const [books, setBooks] = useState([]);
+  const [editId, setEditId] = useState(null);
 
   const [formData, setFormData] = useState({
     title: "",
     Author: "",
     Price: "",
   });
+
+  useEffect(() => {
+    fetchBooks();
+    
+  }, []);
+
+
+  const fetchBooks = async () => {
+    const res = await instance.get("/library");
+    setBooks(res.data);
+    console.log(res.data);
+  };
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
-      let result = await instance.post("/library", formData);
-      const fetchBooks = async () => {
-        const res = await instance.get("/library");
-        setBooks(res.data);
-        console.log(res.data);
-      };
+      if (editId) {
+        await instance.put(`/library/${editId}`, formData);
+      } else {
+        let result = await instance.post("/library", formData);
+      }
       await fetchBooks();
+
+      setFormData({
+        title: "",
+        Author: "",
+        Price: "",
+      });
+      setEditId(null);
     } catch (err) {
       console.log("librabry err", err);
     }
 
     console.log(formData);
   };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -35,9 +55,26 @@ export default function Library() {
     }));
   };
 
+  const handleDelete = async (id) => {
+    try {
+      await instance.delete(`/library/${id}`);
+      fetchBooks();
+    } catch (err) {
+      console.log("delete error ", err);
+    }
+  };
+
+  const handleEdit = (book) => {
+    setFormData({
+      title: book.title,
+      Author: book.Author,
+      Price: book.Price,
+    });
+
+    setEditId(book._id);
+  };
   return (
     <>
-
       <div className="library">
         <form onSubmit={handleSubmit}>
           <label>Title</label>
@@ -77,8 +114,8 @@ export default function Library() {
             <h3>Title :{book.title}</h3>
             <h3>Author : {book.Author}</h3>
             <h3>Price : {book.Price}</h3>
-            <button>update</button>  &nbsp;
-            <button>delete</button>
+            <button onClick={() => handleEdit(book)}>update</button> &nbsp;
+            <button onClick={() => handleDelete(book._id)}>delete</button>
             <hr />
           </div>
         ))}
