@@ -29,6 +29,7 @@ app.post("/library", async (req, res) => {
   try {
     let { title, Author, Price } = req.body;
     console.log(req.body);
+    //validation
     if (!title || !Author || !Price) {
       console.log("fill your data");
       res.status(404).json({
@@ -45,7 +46,7 @@ app.post("/library", async (req, res) => {
 
     await newBook.save();
 
-    res.status(201).json({
+    res.status(200).json({
       success: true,
       message: "Book created successfully",
       data: newBook,
@@ -90,13 +91,22 @@ app.put("/library/:id", async (req, res) => {
   try {
     const { id } = req.params;
     const { title, Author, Price } = req.body;
+    console.log(req.body); 
 
+  
+  if (!title || !Author || !Price) {
+      console.log("fill your data");
+      return res.status(404).json({
+        success: false,
+        message: "fill your data",
+      });
+    }
+    
     const updateBook = await Book.findByIdAndUpdate(
       id,
       { title, Author, Price },
       { new: true },
     );
-
     if (!updateBook) {
       return res.status(404).json({
         success: false,
@@ -111,7 +121,7 @@ app.put("/library/:id", async (req, res) => {
   } catch (err) {
     res.status(500).json({
       success: false,
-      message: "Server Error",
+      message: "Server Error123",
     });
   }
 });
