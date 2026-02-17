@@ -36,6 +36,7 @@ export default function Login() {
           placeholder="Enter your Password"
           required
         />
+        <button>Login</button>
       </form>
     </>
   );
