@@ -1,8 +1,9 @@
 const express = require("express");
 const mongoose = require("mongoose");
-const Book = require("./Model/library.js");
 const app = express();
 const cors = require("cors");
+const Book = require("./Model/library.js");
+const userRouter = require("./Routes/userRouter.js")
 
 main().catch((err) => console.log(err));
 
@@ -11,6 +12,9 @@ async function main() {
 }
 app.use(cors());
 app.use(express.json());
+//userRoutes
+app.use("/user" , userRouter);
+
 
 //routes
 app.get("/library", async (req, res) => {
@@ -93,7 +97,7 @@ app.put("/library/:id", async (req, res) => {
     const { title, Author, Price } = req.body;
     console.log(req.body); 
 
-  
+  //validation
   if (!title || !Author || !Price) {
       console.log("fill your data");
       return res.status(404).json({
