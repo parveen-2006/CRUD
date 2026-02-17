@@ -17,7 +17,7 @@ export default function Login() {
   return (
     <>
       <form>
-        <label>Email : </label>
+        <label>Email :</label>
         <input
           type="email"
           name="email"

@@ -12,7 +12,7 @@ router.post("/register", async (req, res) => {
     if (!name || !email || !password) {
       return res.status(400).json({
         success: false,
-        message: "fill your data",
+        message: "fill your data" 
       });
     }
     const registerUser = await User.findOne({ email });
