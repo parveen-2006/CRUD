@@ -20,7 +20,7 @@ export default function App() {
 
         {/* protected routes */}
         <Route element={<Protected />}>
-          <Route path="/" element={<Home />} />
+          <Route path="/" element={<Library />} />
         </Route>
       </Routes>
       {/* <Library /> */}

@@ -1,13 +1,14 @@
 import React from "react";
 import { useState } from "react";
-
+import instance from "../services/api";
+import { useNavigate } from "react-router-dom";
 export default function Register() {
   const [register, setRegister] = useState({
-    name : "" ,
+    name: "",
     email: "",
     password: "",
   });
-
+let navigate=useNavigate()
   const handleChange = (e) => {
     const { name, value } = e.target;
     setRegister((prev) => ({
@@ -16,10 +17,22 @@ export default function Register() {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-  }
+    try {
+      const response = await instance.post("/user/register" , register);
+      if(response.data.success){
+        setTimeout(() => {
+          navigate("/login")
+            // window.location.href = "/login";
+        },1000)
+        alert("succesfully register")
+      }
+    } catch (err) {
 
+     console.log("registrtion err" , err)
+    }
+  };
   return (
     <>
       <form onSubmit={handleSubmit}>
@@ -52,7 +65,8 @@ export default function Register() {
           placeholder="Enter your Password"
           required
         />
-        <button onClick={()=> handle}>Register</button>
+        <button type="submit">Register</button>{" "}
+        {/* data will be saved in mongodb and how will you do this it is your work */}
       </form>
     </>
   );

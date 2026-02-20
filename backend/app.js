@@ -4,6 +4,8 @@ const app = express();
 const cors = require("cors");
 const Book = require("./Model/library.js");
 const userRouter = require("./Routes/userRouter.js")
+const jwt = require("jsonwebtoken");
+const User = require("./Model/User.js");
 
 main().catch((err) => console.log(err));
 
@@ -16,8 +18,55 @@ app.use(express.json());
 app.use("/user" , userRouter);
 
 
+const authVerify = async(req,res , next) =>{
+  try {
+    if(req.headers && req.headers.bearer){
+      let token = req.headers.bearer;
+const JWT_SECRET = "CRUD-MAIN";
+       const decodedUser = jwt.verify(token , JWT_SECRET);
+if(!decodedUser){
+    return res.status(400).json({
+      success : false,
+   message : "unauthorized user"
+    })  
+  }     
+    const email = decodedUser.registeredUser.email;
+
+       const user = User.findOne({email});
+       console.log(user);
+       if(!user){
+    return res.status(400).json({
+      success : false,
+   message : "unauthorized user"
+    })
+
+    
+       }
+       next();
+    }
+  } catch (error) {
+    console.log("auth error", error.message);
+
+    return res.status(403).json({
+      success: false,
+      message: "not authorized",
+    });
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
 //routes
-app.get("/library", async (req, res) => {
+app.get("/library", authVerify , async (req, res) => {
   try {
     const books = await Book.find();
     res.status(200).json(books);

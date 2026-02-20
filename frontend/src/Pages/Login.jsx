@@ -1,5 +1,6 @@
 import React from "react";
 import { useState } from "react";
+import instance from "../services/api";
 
 export default function Login() {
   const [login, setLogin] = useState({
@@ -14,9 +15,24 @@ export default function Login() {
       [name]: value,
     }));
   };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    try {
+      const response = await instance.post('/user/login' , login);
+      if(response &&response.data.success && response.data.token){
+        localStorage.setItem("token" , response.data.token);
+      }
+
+      
+    } catch (err) {
+      console.log('Login err' , err)
+    }
+  };
   return (
     <>
-      <form>
+      <form onSubmit={handleSubmit}>
         <label>Email :</label>
         <input
           type="email"

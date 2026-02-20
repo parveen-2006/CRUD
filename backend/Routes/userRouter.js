@@ -8,6 +8,7 @@ const router = express.Router();
 router.post("/register", async (req, res) => {
   try {
     const { name, email, password } = req.body;
+    console.log(req.body);
     //validation
     if (!name || !email || !password) {
       return res.status(400).json({
@@ -16,6 +17,7 @@ router.post("/register", async (req, res) => {
       });
     }
     const registerUser = await User.findOne({ email });
+    console.log(registerUser);
     if (registerUser) {
       return res.status(400).json({
         success: false,
@@ -28,12 +30,16 @@ router.post("/register", async (req, res) => {
       email,
       password,
     });
+    
+    newRegister.password = undefined;
+
     res.status(201).json({
       success: true,
       message: "registration successful",
       newRegister,
     });
   } catch (err) {
+    console.log("register" , err);
     res.status(500).json({
       success: false,
       message: "Server Error",
@@ -44,12 +50,30 @@ router.post("/register", async (req, res) => {
 router.post("/login", async (req, res) => {
   const { email, password } = req.body;
 
-  const RegisteredUser = await User.findOne({ email });
-  if (email == RegisteredUser.email) {
-    return res.status(201).json({
-      sucess: true,
-      message: "User Logged in",
-    });
+  const registeredUser = await User.findOne({ email });
+  
+
+  if(!registeredUser){
+return res.status()
   }
+  
+  let tokenPayload = {
+    registeredUser,
+  }
+const JWT_SECRET = "CRUD-MAIN";
+
+  let token = jwt.sign(
+    tokenPayload,
+     JWT_SECRET,
+    {expiresIn : '24h'}
+  );
+
+return res.status(200).json({
+  success : true,
+  token,
+  message : "login succsfully"
+})
+
+
 });
 module.exports = router;
