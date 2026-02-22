@@ -1,5 +1,4 @@
 const mongoose = require("mongoose");
-const express = require("express")
 
 let userSchema = new mongoose.Schema({
   name: {

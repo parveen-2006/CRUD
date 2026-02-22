@@ -8,7 +8,9 @@ export default function Register() {
     email: "",
     password: "",
   });
-let navigate=useNavigate()
+
+  let navigate = useNavigate();
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setRegister((prev) => ({
@@ -20,17 +22,16 @@ let navigate=useNavigate()
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await instance.post("/user/register" , register);
-      if(response.data.success){
+      const response = await instance.post("/user/register", register);
+      if (response.data.success) {
         setTimeout(() => {
-          navigate("/login")
-            // window.location.href = "/login";
-        },1000)
-        alert("succesfully register")
+          navigate("/login");
+          // window.location.href = "/login";
+        }, 1000);
+        alert("succesfully register");
       }
     } catch (err) {
-
-     console.log("registrtion err" , err)
+      console.log("registrtion err", err);
     }
   };
   return (

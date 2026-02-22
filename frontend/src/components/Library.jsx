@@ -15,25 +15,21 @@ export default function Library() {
   useEffect(() => {
     fetchBooks();
   }, []);
- 
-
 
   const fetchBooks = async () => {
-    try{
- let token = localStorage.getItem("token");
-    const result = await instance.get("/library" , {
-      headers : `Bearer : ${token}`
-    });
+    try {
+      let token = localStorage.getItem("token");
+      const result = await instance.get("/library", {
+        headers: {
+          Authorization: `Bearer ${token}`, // object in corret format
+        },
+      });
 
-console.log(result);
-    // setBooks(res.data);
-    }catch(err){
-
-      console.log("get books err" , err);
-      
+      console.log(result);
+      setBooks(result.data);
+    } catch (err) {
+      console.log("get books err", err);
     }
-   
-   
   };
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -72,11 +68,10 @@ console.log(result);
       await instance.delete(`/library/${id}`);
       fetchBooks();
     } catch (err) {
-
       console.log("delete error ", err);
     }
   };
-  //edit 
+  //edit
   const handleEdit = (book) => {
     setFormData({
       title: book.title,

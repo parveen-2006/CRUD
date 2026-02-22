@@ -3,9 +3,10 @@ const mongoose = require("mongoose");
 const app = express();
 const cors = require("cors");
 const Book = require("./Model/library.js");
-const userRouter = require("./Routes/userRouter.js")
+const userRouter = require("./Routes/userRouter.js");
 const jwt = require("jsonwebtoken");
 const User = require("./Model/User.js");
+const Port = process.env.Port || 3000;
 
 main().catch((err) => console.log(err));
 
@@ -15,34 +16,35 @@ async function main() {
 app.use(cors());
 app.use(express.json());
 //userRoutes
-app.use("/user" , userRouter);
+app.use("/user", userRouter);
 
-
-const authVerify = async(req,res , next) =>{
+const authVerify = async (req, res, next) => {
   try {
-    if(req.headers && req.headers.bearer){
-      let token = req.headers.bearer;
-const JWT_SECRET = "CRUD-MAIN";
-       const decodedUser = jwt.verify(token , JWT_SECRET);
-if(!decodedUser){
-    return res.status(400).json({
-      success : false,
-   message : "unauthorized user"
-    })  
-  }     
-    const email = decodedUser.registeredUser.email;
+    if (req.headers && req.headers.authorization) {
+      let token = req.headers.authorization.split(" ")[1];
+      const JWT_SECRET = "CRUD-MAIN";
+      const decodedUser = jwt.verify(token, JWT_SECRET);
+      if (!decodedUser) {
+        return res.status(400).json({
+          success: false,
+          message: "unauthorized user",
+        });
+      }
+      const email = decodedUser.registeredUser.email;
 
-       const user = User.findOne({email});
-       console.log(user);
-       if(!user){
-    return res.status(400).json({
-      success : false,
-   message : "unauthorized user"
-    })
-
-    
-       }
-       next();
+      const user = await User.findOne({ email });
+      console.log(user);
+      if (!user) {
+        return res.status(400).json({
+          success: false,
+          message: "unauthorized user",
+        });
+      }
+      next();
+    } else {
+      return res
+        .status(401)
+        .json({ success: false, message: "no token provided" });
     }
   } catch (error) {
     console.log("auth error", error.message);
@@ -52,21 +54,10 @@ if(!decodedUser){
       message: "not authorized",
     });
   }
-}
-
-
-
-
-
-
-
-
-
-
-
+};
 
 //routes
-app.get("/library", authVerify , async (req, res) => {
+app.get("/library", authVerify, async (req, res) => {
   try {
     const books = await Book.find();
     res.status(200).json(books);
@@ -144,17 +135,17 @@ app.put("/library/:id", async (req, res) => {
   try {
     const { id } = req.params;
     const { title, Author, Price } = req.body;
-    console.log(req.body); 
+    console.log(req.body);
 
-  //validation
-  if (!title || !Author || !Price) {
+    //validation
+    if (!title || !Author || !Price) {
       console.log("fill your data");
       return res.status(404).json({
         success: false,
         message: "fill your data",
       });
     }
-    
+
     const updateBook = await Book.findByIdAndUpdate(
       id,
       { title, Author, Price },
@@ -179,6 +170,6 @@ app.put("/library/:id", async (req, res) => {
   }
 });
 
-app.listen(3000, () => {
-  console.log("runnning on port");
+app.listen(Port, () => {
+  console.log(`localhost:${Port}`);
 });

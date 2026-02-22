@@ -7,6 +7,8 @@ import Register from "./Pages/Register";
 import Home from "./Pages/Home";
 import Protected from "./components/Protected";
 import Navbar from "./Pages/Navbar";
+import Cart from "./Pages/Cart";
+import Store from "./Pages/Store";
 
 export default function App() {
   return (
@@ -17,10 +19,13 @@ export default function App() {
       <Routes>
         <Route path="/Login" element={<Login />} />
         <Route path="/Register" element={<Register />} />
+        <Route path="/Store" element={<Store />} />
+        <Route path="/Cart" element={<Cart />} />
 
         {/* protected routes */}
         <Route element={<Protected />}>
           <Route path="/" element={<Library />} />
+
         </Route>
       </Routes>
       {/* <Library /> */}
