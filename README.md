@@ -4,3 +4,4 @@
 - backend strutured
 - database connected
 - api works
+- Admin panel 
