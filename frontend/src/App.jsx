@@ -7,7 +7,6 @@ import Register from "./Pages/Register";
 import Home from "./Pages/Home";
 import Protected from "./components/Protected";
 import Navbar from "./Pages/Navbar";
-import Cart from "./Pages/Cart";
 import Store from "./Pages/Store";
 
 export default function App() {
@@ -17,15 +16,14 @@ export default function App() {
 
       {/* public routes */}
       <Routes>
+        <Route path="/" element={<Home/>}></Route>
         <Route path="/Login" element={<Login />} />
         <Route path="/Register" element={<Register />} />
-        <Route path="/Store" element={<Store />} />
-        <Route path="/Cart" element={<Cart />} />
 
+        <Route path="/Library" element={<Library />} />
         {/* protected routes */}
         <Route element={<Protected />}>
-          <Route path="/" element={<Library />} />
-
+          <Route path="/Store" element={<Store />} />
         </Route>
       </Routes>
       {/* <Library /> */}

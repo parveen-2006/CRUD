@@ -20,10 +20,12 @@ app.use("/user", userRouter);
 
 const authVerify = async (req, res, next) => {
   try {
+  //  console.log(req.headers.authorization);
     if (req.headers && req.headers.authorization) {
       let token = req.headers.authorization.split(" ")[1];
       const JWT_SECRET = "CRUD-MAIN";
       const decodedUser = jwt.verify(token, JWT_SECRET);
+      // console.log(decodedUser);
       if (!decodedUser) {
         return res.status(400).json({
           success: false,
@@ -33,13 +35,14 @@ const authVerify = async (req, res, next) => {
       const email = decodedUser.registeredUser.email;
 
       const user = await User.findOne({ email });
-      console.log(user);
+      // console.log(user);
       if (!user) {
         return res.status(400).json({
           success: false,
           message: "unauthorized user",
         });
       }
+      req.user = user;
       next();
     } else {
       return res
@@ -56,8 +59,11 @@ const authVerify = async (req, res, next) => {
   }
 };
 
+
+
+
 //routes
-app.get("/library", authVerify, async (req, res) => {
+app.get("/library", async (req, res) => {
   try {
     const books = await Book.find();
     res.status(200).json(books);
@@ -69,12 +75,14 @@ app.get("/library", authVerify, async (req, res) => {
 });
 
 //create route
-app.post("/library", async (req, res) => {
+app.post("/library", authVerify ,async (req, res) => {
   try {
-    let { title, Author, Price } = req.body;
+    let { title, Author, Price , description} = req.body;
     console.log(req.body);
-    //validation
-    if (!title || !Author || !Price) {
+    const user = req.user;
+   
+    //validation;
+    if (!title || !Author || !Price || !description) {
       console.log("fill your data");
       res.status(404).json({
         success: false,
@@ -84,18 +92,25 @@ app.post("/library", async (req, res) => {
 
     let newBook = new Book({
       title,
-      Author,
+      description, 
       Price,
+      Author : user._id
     });
 
-    await newBook.save();
+  const result = await newBook.save();
+   const {email} = user;
+  const currentUser = await User.findOne({email});
+ 
+  currentUser.books.push(result._id);
+  
+  await currentUser.save();
+ 
 
     res.status(200).json({
       success: true,
       message: "Book created successfully",
       data: newBook,
     });
-    console.log("saved :", newBook);
   } catch (err) {
     console.log("create : ", err);
 
