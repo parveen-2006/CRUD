@@ -3,10 +3,11 @@ const mongoose = require("mongoose");
 const app = express();
 const cors = require("cors");
 const Book = require("./Model/library.js");
-const userRouter = require("./Routes/userRouter.js");
 const jwt = require("jsonwebtoken");
 const User = require("./Model/User.js");
 const Port = process.env.Port || 3000;
+const userRouter = require("./Routes/userRouter.js");
+const authVerify = require("./auth/authVerify.js");
 
 main().catch((err) => console.log(err));
 
@@ -17,49 +18,8 @@ app.use(cors());
 app.use(express.json());
 //userRoutes
 app.use("/user", userRouter);
-
-const authVerify = async (req, res, next) => {
-  try {
-  //  console.log(req.headers.authorization);
-    if (req.headers && req.headers.authorization) {
-      let token = req.headers.authorization.split(" ")[1];
-      const JWT_SECRET = "CRUD-MAIN";
-      const decodedUser = jwt.verify(token, JWT_SECRET);
-      // console.log(decodedUser);
-      if (!decodedUser) {
-        return res.status(400).json({
-          success: false,
-          message: "unauthorized user",
-        });
-      }
-      const email = decodedUser.registeredUser.email;
-
-      const user = await User.findOne({ email });
-      // console.log(user);
-      if (!user) {
-        return res.status(400).json({
-          success: false,
-          message: "unauthorized user",
-        });
-      }
-      req.user = user;
-      next();
-    } else {
-      return res
-        .status(401)
-        .json({ success: false, message: "no token provided" });
-    }
-  } catch (error) {
-    console.log("auth error", error.message);
-
-    return res.status(403).json({
-      success: false,
-      message: "not authorized",
-    });
-  }
-};
-
-
+//AuthVerify
+app.use("/auth" , authVerify)
 
 
 //routes
@@ -79,7 +39,7 @@ app.post("/library", authVerify ,async (req, res) => {
   try {
     let { title, Author, Price , description} = req.body;
     console.log(req.body);
-    const user = req.user;
+    const user = req.user; // <--accessing it from authVerify!
    
     //validation;
     if (!title || !Author || !Price || !description) {
@@ -97,9 +57,9 @@ app.post("/library", authVerify ,async (req, res) => {
       Author : user._id
     });
 
-  const result = await newBook.save();
+  const result = await newBook.save(); // <--- decoded user
    const {email} = user;
-  const currentUser = await User.findOne({email});
+  const currentUser = await User.findOne({email}); // <--- this for email 
  
   currentUser.books.push(result._id);
   

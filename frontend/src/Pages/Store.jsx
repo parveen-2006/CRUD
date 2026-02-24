@@ -9,10 +9,22 @@ export default function Store() {
   const [showEditModal, setShowEditModal] = useState(false);
   const [selectedBook, setSelectedBook] = useState(null);
 
-  const [addData, setAddData] = useState({ title: "", Author: "", Price: "", description: "" });
-  const [editData, setEditData] = useState({ title: "", Author: "", Price: "", description: "" });
+  const [addData, setAddData] = useState({
+    title: "",
+    Author: "",
+    Price: "",
+    description: "",
+  });
+  const [editData, setEditData] = useState({
+    title: "",
+    Author: "",
+    Price: "",
+    description: "",
+  });
 
-  useEffect(() => { fetchData(); }, []);
+  useEffect(() => {
+    fetchData();
+  }, []);
 
   const fetchData = async () => {
     try {
@@ -33,9 +45,9 @@ export default function Store() {
     e.preventDefault();
     try {
       const token = localStorage.getItem("token");
-       const response = await instance.post("/library", addData,{
+      const response = await instance.post("/library", addData, {
         headers: {
-          authorization: `Bearer ${token}`, 
+          authorization: `Bearer ${token}`,
         },
       });
       console.log(response);
@@ -50,7 +62,12 @@ export default function Store() {
   // EDIT
   const openEdit = (book) => {
     setSelectedBook(book);
-    setEditData({ title: book.title, Author: book.Author, Price: book.Price, description: book.description || "" });
+    setEditData({
+      title: book.title,
+      Author: book.Author,
+      Price: book.Price,
+      description: book.description || "",
+    });
     setShowEditModal(true);
   };
 
@@ -59,35 +76,75 @@ export default function Store() {
     setEditData((prev) => ({ ...prev, [name]: value }));
   };
 
+  const handleEditSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      let response = await instance.put(
+        `/library/${selectedBook._id}`,
+        editData,
+      );
+      setShowEditModal(false);
+      fetchData();
+      console.log(response);
+
+      setEditData({
+        title: "",
+        Author: "",
+        Price: "",
+        description: "",
+      });
+    } catch (err) {
+      console.log("handledit err", err.response);
+    }
+  };
+
   // DELETE
   const openDelete = (book) => {
     setSelectedBook(book);
     setShowDeleteModal(true);
   };
-
+  const handleDelete = async () => {
+    try {
+      const response = await instance.delete(`/library/${selectedBook._id}`);
+      console.log(response.data);
+      setShowDeleteModal(false);
+      fetchData();
+      console.log("Deleting ID:", selectedBook?._id);
+    } catch (err) {
+      console.log("handleDelete err : ", err.response);
+    }
+  };
 
   return (
     <div className="store-container">
-
       {/* Add Button */}
-      <button className="add-btn" onClick={() => setShowAddForm(true)}>+</button>
+      <button className="add-btn" onClick={() => setShowAddForm(true)}>
+        +
+      </button>
       <h1 className="store-heading">📚 My Store</h1>
 
       {/* Book Grid */}
       <div className="book-grid">
-        {store && store.map((book) => (
-          <div className="book-card" key={book._id}>
-            <div className="book-icon">📖</div>
-            <h2 className="book-title">{book.title}</h2>
-            <p className="book-author">✍️ {book.Author}</p>
-            <p className="book-description">{book.description || "No description available."}</p>
-            <p className="book-price">₹ {book.Price}</p>
-            <div className="book-actions">
-              <button className="edit-btn" onClick={() => openEdit(book)}>✏️ Edit</button>
-              <button className="delete-btn" onClick={() => openDelete(book)}>🗑️ Delete</button>
+        {store &&
+          store.map((book) => (
+            <div className="book-card" key={book._id}>
+              <div className="book-icon">📖</div>
+              <h2 className="book-title">{book.title}</h2>
+              <p className="book-author">✍️ {book.Author}</p>
+              <p className="book-description">
+                {book.description || "No description available."}
+              </p>
+              <p className="book-price">₹ {book.Price}</p>
+              <div className="book-actions">
+                <button className="edit-btn" onClick={() => openEdit(book)}>
+                  ✏️ Edit
+                </button>
+                <button className="delete-btn" onClick={() => openDelete(book)}>
+                  🗑️ Delete
+                </button>
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
       </div>
 
       {/* ADD FORM MODAL */}
@@ -98,23 +155,58 @@ export default function Store() {
             <form className="modal-form" onSubmit={handleAddSubmit}>
               <div className="form-group">
                 <label>Title</label>
-                <input type="text" name="title" value={addData.title} onChange={handleAddChange} placeholder="Book title" required />
+                <input
+                  type="text"
+                  name="title"
+                  value={addData.title}
+                  onChange={handleAddChange}
+                  placeholder="Book title"
+                  required
+                />
               </div>
               <div className="form-group">
                 <label>Author</label>
-                <input type="text" name="Author" value={addData.Author} onChange={handleAddChange} placeholder="Author name" required />
+                <input
+                  type="text"
+                  name="Author"
+                  value={addData.Author}
+                  onChange={handleAddChange}
+                  placeholder="Author name"
+                  required
+                />
               </div>
               <div className="form-group">
                 <label>Price (₹)</label>
-                <input type="number" name="Price" value={addData.Price} onChange={handleAddChange} placeholder="Price" required />
+                <input
+                  type="number"
+                  name="Price"
+                  value={addData.Price}
+                  onChange={handleAddChange}
+                  placeholder="Price"
+                  required
+                />
               </div>
               <div className="form-group">
                 <label>Description</label>
-                <textarea name="description" value={addData.description} onChange={handleAddChange} placeholder="Short description..." rows={3} />
+                <textarea
+                  name="description"
+                  value={addData.description}
+                  onChange={handleAddChange}
+                  placeholder="Short description..."
+                  rows={3}
+                />
               </div>
               <div className="modal-actions">
-                <button type="submit" className="auth-btn">Add Book</button>
-                <button type="button" className="cancel-btn" onClick={() => setShowAddForm(false)}>Cancel</button>
+                <button type="submit" className="auth-btn">
+                  Add Book
+                </button>
+                <button
+                  type="button"
+                  className="cancel-btn"
+                  onClick={() => setShowAddForm(false)}
+                >
+                  Cancel
+                </button>
               </div>
             </form>
           </div>
@@ -129,23 +221,58 @@ export default function Store() {
             <form className="modal-form" onSubmit={handleEditSubmit}>
               <div className="form-group">
                 <label>Title</label>
-                <input type="text" name="title" value={editData.title} onChange={handleEditChange} placeholder="Book title" required />
+                <input
+                  type="text"
+                  name="title"
+                  value={editData.title}
+                  onChange={handleEditChange}
+                  placeholder="Book title"
+                  required
+                />
               </div>
               <div className="form-group">
                 <label>Author</label>
-                <input type="text" name="Author" value={editData.Author} onChange={handleEditChange} placeholder="Author name" required />
+                <input
+                  type="text"
+                  name="Author"
+                  value={editData.Author}
+                  onChange={handleEditChange}
+                  placeholder="Author name"
+                  required
+                />
               </div>
               <div className="form-group">
                 <label>Price (₹)</label>
-                <input type="number" name="Price" value={editData.Price} onChange={handleEditChange} placeholder="Price" required />
+                <input
+                  type="number"
+                  name="Price"
+                  value={editData.Price}
+                  onChange={handleEditChange}
+                  placeholder="Price"
+                  required
+                />
               </div>
               <div className="form-group">
                 <label>Description</label>
-                <textarea name="description" value={editData.description} onChange={handleEditChange} placeholder="Short description..." rows={3} />
+                <textarea
+                  name="description"
+                  value={editData.description}
+                  onChange={handleEditChange}
+                  placeholder="Short description..."
+                  rows={3}
+                />
               </div>
               <div className="modal-actions">
-                <button type="submit" className="auth-btn">Save Changes</button>
-                <button type="button" className="cancel-btn" onClick={() => setShowEditModal(false)}>Cancel</button>
+                <button type="submit" className="auth-btn">
+                  Save Changes
+                </button>
+                <button
+                  type="button"
+                  className="cancel-btn"
+                  onClick={() => setShowEditModal(false)}
+                >
+                  Cancel
+                </button>
               </div>
             </form>
           </div>
@@ -158,15 +285,25 @@ export default function Store() {
           <div className="modal-card delete-modal">
             <div className="delete-icon">🗑️</div>
             <h2 className="modal-title">Delete Book?</h2>
-            <p className="delete-msg">Are you sure you want to delete <span>"{selectedBook?.title}"</span>? This action cannot be undone.</p>
+            <p className="delete-msg">
+              Are you sure you want to delete{" "}
+              <span>"{selectedBook?.title}"</span>? This action cannot be
+              undone.
+            </p>
             <div className="modal-actions">
-              <button className="delete-confirm-btn" onClick={handleDelete}>Yes, Delete</button>
-              <button className="cancel-btn" onClick={() => setShowDeleteModal(false)}>Cancel</button>
+              <button className="delete-confirm-btn" onClick={handleDelete}>
+                Yes, Delete
+              </button>
+              <button
+                className="cancel-btn"
+                onClick={() => setShowDeleteModal(false)}
+              >
+                Cancel
+              </button>
             </div>
           </div>
         </div>
       )}
-
     </div>
   );
 }
