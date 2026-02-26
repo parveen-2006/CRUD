@@ -55,7 +55,7 @@ router.post("/login", async (req, res) => {
   if (!registeredUser) {
     return res.status(404).json({
       success: false,
-      message: "user not found   ",
+      message: "user not found",
     });
   }
 

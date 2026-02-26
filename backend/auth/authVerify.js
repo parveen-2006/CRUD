@@ -21,7 +21,7 @@ const authVerify = async (req, res, next) => {
       const email = decodedUser.registeredUser.email;
 
       const user = await User.findOne({ email });  // <---now here is the decoded user!
-      console.log(user);
+      // console.log(user);
       if (!user) {
         return res.status(400).json({
           success: false,

@@ -8,6 +8,7 @@ export default function Store() {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [selectedBook, setSelectedBook] = useState(null);
+  const [name , setName] = useState();
 
   const [addData, setAddData] = useState({
     title: "",
@@ -28,8 +29,15 @@ export default function Store() {
 
   const fetchData = async () => {
     try {
-      const result = await instance.get("/library");
-      setStore(result.data);
+      const token = localStorage.getItem("token")
+      const result = await instance.get("/store" , {
+        headers : {
+          authorization : `bearer ${token}`
+        }
+      });
+      console.log(result);
+      setStore(result.data.data.books);
+      setName(result.data.data.name);
     } catch (err) {
       console.log("Fetch Data err : ", err.response);
     }
@@ -56,6 +64,7 @@ export default function Store() {
       fetchData();
     } catch (err) {
       console.log("Add err:", err.response.data);
+      alert(err.response.data.message);
     }
   };
 
@@ -130,7 +139,7 @@ export default function Store() {
             <div className="book-card" key={book._id}>
               <div className="book-icon">📖</div>
               <h2 className="book-title">{book.title}</h2>
-              <p className="book-author">✍️ {book.Author}</p>
+              <p className="book-author">✍️ {name}</p>
               <p className="book-description">
                 {book.description || "No description available."}
               </p>

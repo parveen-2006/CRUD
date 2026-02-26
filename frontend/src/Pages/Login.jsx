@@ -21,7 +21,8 @@ export default function Login() {
         navigate("/store");
       }
     } catch (err) {
-      console.log("Login err", err);
+      console.log("Login err", err.response.data.message);
+      alert(err.response.data.message)
     }
   };
 

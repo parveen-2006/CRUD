@@ -25,8 +25,11 @@ app.use("/auth" , authVerify)
 //routes
 app.get("/library", async (req, res) => {
   try {
-    const books = await Book.find();
-    res.status(200).json(books);
+    const books = await Book.find().populate("Author");
+    res.status(200).json({
+      success : true,
+      data : books
+    });
   } catch (err) {
     res.status(500).json({
       message: "error fetching books",
@@ -34,15 +37,42 @@ app.get("/library", async (req, res) => {
   }
 });
 
+app.get("/store" , authVerify , async(req,res) => {
+  try{
+   const user = req.user;
+   const {email} = user;
+   const userDetails = await User.findOne({email}).populate("books");
+   
+   return res.status(200).json({
+    success : true,
+    data : 
+      userDetails,
+    
+   })
+
+  }catch(err){
+console.log("store route err" , err);
+return res.status(500).json({
+  succes : false,
+  message : "server err" || err.name
+})
+
+  }
+})
+
+
+
+
+
 //create route
 app.post("/library", authVerify ,async (req, res) => {
   try {
-    let { title, Author, Price , description} = req.body;
+    let { title, Price , description} = req.body;
     console.log(req.body);
     const user = req.user; // <--accessing it from authVerify!
    
     //validation;
-    if (!title || !Author || !Price || !description) {
+    if (!title || !Price || !description) {
       console.log("fill your data");
       res.status(404).json({
         success: false,
@@ -57,7 +87,7 @@ app.post("/library", authVerify ,async (req, res) => {
       Author : user._id
     });
 
-  const result = await newBook.save(); // <--- decoded user
+  const result = await newBook.save(); 
    const {email} = user;
   const currentUser = await User.findOne({email}); // <--- this for email 
  
@@ -80,6 +110,9 @@ app.post("/library", authVerify ,async (req, res) => {
     });
   }
 });
+
+
+
 
 //delete route
 app.delete("/library/:id", async (req, res) => {
@@ -106,7 +139,7 @@ app.delete("/library/:id", async (req, res) => {
 });
 
 //UPDATE route
-app.put("/library/:id", async (req, res) => {
+app.put("/library/:id", authVerify , async (req, res) => {
   try {
     const { id } = req.params;
     const { title, Author, Price } = req.body;

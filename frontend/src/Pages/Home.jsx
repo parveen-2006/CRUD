@@ -14,7 +14,8 @@ export default function Home() {
   const fetchData = async () => {
     try {
       const result = await instance.get("/library");
-      setStore(result.data);
+      console.log(result);
+      setStore(result.data.data);
     } catch (err) {
       console.log("Fetch Data err : ", err.response);
     }
@@ -28,7 +29,7 @@ export default function Home() {
           <div className="book-card" key={book._id}>
             <div className="book-icon">📖</div>
             <h2 className="book-title">{book.title}</h2>
-            <p className="book-author">✍️ {book.Author}</p>
+            <p className="book-author">✍️ {book.Author.name}</p>
             <p className="book-price">₹ {book.Price}</p>
             <button className="buy-btn">Buy Now</button>
           </div>
