@@ -19,16 +19,15 @@ app.use(express.json());
 //userRoutes
 app.use("/user", userRouter);
 //AuthVerify
-app.use("/auth" , authVerify)
-
+app.use("/auth", authVerify);
 
 //routes
 app.get("/library", async (req, res) => {
   try {
-    const books = await Book.find().populate("Author");
+    const books = await Book.find().populate("Author"); // populate
     res.status(200).json({
-      success : true,
-      data : books
+      success: true,
+      data: books,
     });
   } catch (err) {
     res.status(500).json({
@@ -37,40 +36,32 @@ app.get("/library", async (req, res) => {
   }
 });
 
-app.get("/store" , authVerify , async(req,res) => {
-  try{
-   const user = req.user;
-   const {email} = user;
-   const userDetails = await User.findOne({email}).populate("books");
-   
-   return res.status(200).json({
-    success : true,
-    data : 
-      userDetails,
-    
-   })
+app.get("/store", authVerify, async (req, res) => {
+  try {
+    const user = req.user;
+    const { email } = user;
+    const userDetails = await User.findOne({ email }).populate("books");
 
-  }catch(err){
-console.log("store route err" , err);
-return res.status(500).json({
-  succes : false,
-  message : "server err" || err.name
-})
-
+    return res.status(200).json({
+      success: true,
+      data: userDetails,
+    });
+  } catch (err) {
+    console.log("store route err", err);
+    return res.status(500).json({
+      succes: false,
+      message: "server err" || err.name,
+    });
   }
-})
-
-
-
-
+});
 
 //create route
-app.post("/library", authVerify ,async (req, res) => {
+app.post("/library", authVerify, async (req, res) => {
   try {
-    let { title, Price , description} = req.body;
+    let { title, Price, description } = req.body;
     console.log(req.body);
     const user = req.user; // <--accessing it from authVerify!
-   
+
     //validation;
     if (!title || !Price || !description) {
       console.log("fill your data");
@@ -82,19 +73,18 @@ app.post("/library", authVerify ,async (req, res) => {
 
     let newBook = new Book({
       title,
-      description, 
+      description,
       Price,
-      Author : user._id
+      Author: user._id,
     });
 
-  const result = await newBook.save(); 
-   const {email} = user;
-  const currentUser = await User.findOne({email}); // <--- this for email 
- 
-  currentUser.books.push(result._id);
-  
-  await currentUser.save();
- 
+    const result = await newBook.save();
+    const { email } = user;
+    const currentUser = await User.findOne({ email }); // <--- this for email
+
+    currentUser.books.push(result._id);
+
+    await currentUser.save();
 
     res.status(200).json({
       success: true,
@@ -110,9 +100,6 @@ app.post("/library", authVerify ,async (req, res) => {
     });
   }
 });
-
-
-
 
 //delete route
 app.delete("/library/:id", async (req, res) => {
@@ -139,7 +126,7 @@ app.delete("/library/:id", async (req, res) => {
 });
 
 //UPDATE route
-app.put("/library/:id", authVerify , async (req, res) => {
+app.put("/library/:id", authVerify, async (req, res) => {
   try {
     const { id } = req.params;
     const { title, Author, Price } = req.body;

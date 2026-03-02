@@ -73,7 +73,6 @@ export default function Store() {
     setSelectedBook(book);
     setEditData({
       title: book.title,
-      Author: book.Author,
       Price: book.Price,
       description: book.description || "",
     });
@@ -170,17 +169,6 @@ export default function Store() {
                   value={addData.title}
                   onChange={handleAddChange}
                   placeholder="Book title"
-                  required
-                />
-              </div>
-              <div className="form-group">
-                <label>Author</label>
-                <input
-                  type="text"
-                  name="Author"
-                  value={addData.Author}
-                  onChange={handleAddChange}
-                  placeholder="Author name"
                   required
                 />
               </div>
