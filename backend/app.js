@@ -35,7 +35,7 @@ app.get("/library", async (req, res) => {
     });
   }
 });
-
+// Store route
 app.get("/store", authVerify, async (req, res) => {
   try {
     const user = req.user;
@@ -51,6 +51,44 @@ app.get("/store", authVerify, async (req, res) => {
     return res.status(500).json({
       succes: false,
       message: "server err" || err.name,
+    });
+  }
+});
+
+// Store update route
+app.put("/store/:id", async (req, res) => {
+  try {
+    let { id } = req.params;
+    let { title, Price, Author, description } = req.body;
+
+    //validation
+    if (!title || !description || !Price) {
+      console.log("fill you data");
+      res.status(404).json({
+        sucess: false,
+        message: "Fill you data",
+      });
+    }
+
+    let editBook = await Book.findByIdAndUpdate(
+      id,
+      { title, Price, Author, description },
+      { new: true },
+    );
+    if (!editBook) {
+      res.status(401).json({
+        success: false,
+        message: "Book not found",
+      });
+    }
+    res.status(200).json({
+      success: true,
+      message: "book updated successfully",
+    });
+  } catch (err) {
+    res.status(400).json({
+      success: false,
+      message: "Store Route : Internal server error",
     });
   }
 });

@@ -8,7 +8,7 @@ export default function Store() {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [selectedBook, setSelectedBook] = useState(null);
-  const [name , setName] = useState();
+  const [name, setName] = useState();
 
   const [addData, setAddData] = useState({
     title: "",
@@ -29,11 +29,11 @@ export default function Store() {
 
   const fetchData = async () => {
     try {
-      const token = localStorage.getItem("token")
-      const result = await instance.get("/store" , {
-        headers : {
-          authorization : `bearer ${token}`
-        }
+      const token = localStorage.getItem("token");
+      const result = await instance.get("/store", {
+        headers: {
+          authorization: `bearer ${token}`,
+        },
       });
       console.log(result);
       setStore(result.data.data.books);
@@ -88,7 +88,7 @@ export default function Store() {
     e.preventDefault();
     try {
       let response = await instance.put(
-        `/library/${selectedBook._id}`,
+        `/store/${selectedBook._id}`,
         editData,
       );
       setShowEditModal(false);
@@ -102,7 +102,8 @@ export default function Store() {
         description: "",
       });
     } catch (err) {
-      console.log("handledit err", err.response);
+      console.log("handlEdit err", err.response);
+      setShowEditModal(false);
     }
   };
 
@@ -224,17 +225,6 @@ export default function Store() {
                   value={editData.title}
                   onChange={handleEditChange}
                   placeholder="Book title"
-                  required
-                />
-              </div>
-              <div className="form-group">
-                <label>Author</label>
-                <input
-                  type="text"
-                  name="Author"
-                  value={editData.Author}
-                  onChange={handleEditChange}
-                  placeholder="Author name"
                   required
                 />
               </div>

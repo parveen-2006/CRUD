@@ -18,7 +18,8 @@ export default function Login() {
       const response = await instance.post("/user/login", login);
       if (response && response.data.success && response.data.token) {
         localStorage.setItem("token", response.data.token);
-        navigate("/store");
+        // navigate("/store");
+        window.location.href="/store";
       }
     } catch (err) {
       console.log("Login err", err.response.data.message);

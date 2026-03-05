@@ -1,27 +1,28 @@
 import React from "react";
 import { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 
 export default function Navbar() {
   const [token, setToken] = useState(!!localStorage.getItem("token"));
-
+  let navigate = useNavigate();
   const handleLogout = () => {
     localStorage.removeItem("token");
     setToken(false);
+    navigate("/login");
   };
 
   return (
     <>
       <nav className="navbar">
         <Link to="/" className="navbar-brand">
-          Logohere
+          Library
         </Link>
         <ul className="navbar-links">
           {/* <li>
           <Link to="/library">Library</Link>
         </li> */}
 
-          { !token ? (
+          {!token ? (
             <>
               <li>
                 <Link to="/login" className="auth-link">

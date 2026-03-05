@@ -16,11 +16,9 @@ export default function App() {
 
       {/* public routes */}
       <Routes>
-        <Route path="/" element={<Home/>}></Route>
+        <Route path="/" element={<Home />}></Route>
         <Route path="/Login" element={<Login />} />
         <Route path="/Register" element={<Register />} />
-
-        <Route path="/Library" element={<Library />} />
         {/* protected routes */}
         <Route element={<Protected />}>
           <Route path="/Store" element={<Store />} />
