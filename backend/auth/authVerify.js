@@ -23,7 +23,7 @@ const authVerify = async (req, res, next) => {
       const user = await User.findOne({ email });  // <---now here is the decoded user!
       // console.log(user);
       if (!user) {
-        return res.status(400).json({
+        return res.status(400).json({ 
           success: false,
           message: "unauthorized user",
         });

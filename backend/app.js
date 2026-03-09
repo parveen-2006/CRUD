@@ -8,12 +8,17 @@ const User = require("./Model/User.js");
 const Port = process.env.Port || 3000;
 const userRouter = require("./Routes/userRouter.js");
 const authVerify = require("./auth/authVerify.js");
+const dotenv = require("dotenv");
+dotenv.config();
+
+
 
 main().catch((err) => console.log(err));
 
 async function main() {
-  await mongoose.connect("mongodb://127.0.0.1:27017/crud");
+  await mongoose.connect(process.env.MONGO_URL);
 }
+console.log(process.env.MONGO_URL);
 app.use(cors());
 app.use(express.json());
 //userRoutes
